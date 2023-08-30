@@ -2,9 +2,9 @@ import { PlusCircleIcon, PlusIcon } from "@heroicons/react/24/outline"
 
 function NewChat() {
     return (
-        <div>
+        <div className="border-gray-700 border chatRow">
             <PlusCircleIcon className="h-5 w-5" />
-            <div>Lorem, ipsum dolor.</div>
+            <div>New Chat</div>
         </div>
     )
 }

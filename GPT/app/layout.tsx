@@ -2,7 +2,10 @@ import SideBar from "@/components/SideBar";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-
+import SessionProvider from "@/components/SessionProvider";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth/next";
+import Login from "@/components/Login";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -22,20 +25,34 @@ export const metadata: Metadata = {
 //   )
 // }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en">
       <body>
-        <div className="flex">
-          {/* Sidebar */}
-          <SideBar/>
-          {/* Centre page */}
-          <div className="bg-slate-600 flex-1">{children}</div>
-        </div>
+        <SessionProvider session={session}>
+          {!session ? (
+            <Login />
+          ) : (
+            <div className="flex">
+              {/* Sidebar */}
+              <div className="bg-slate-900 max-w-sm h-screen overflow-y-auto
+           md:min-w-[20rem]">
+                <SideBar />
+              </div>
+              {/* Centre page */}
+              <div className="bg-slate-600 flex-1">{children}</div>
+            </div>
+          )
+
+          }
+        </SessionProvider>
       </body>
     </html>
   );
