@@ -47,7 +47,7 @@ export default async function RootLayout({
                 <SideBar />
               </div>
               {/* Centre page */}
-              <div className="bg-slate-600 flex-1">{children}</div>
+              <div className="bg-slate-700 flex-1">{children}</div>
             </div>
           )
 
