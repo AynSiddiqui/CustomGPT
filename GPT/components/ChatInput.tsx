@@ -4,10 +4,10 @@ import { useSession } from "next-auth/react";
 import { use, useRef, useState } from "react";
 
 type Props = {
-    chatId: string;
+    id: string;
 }
 
-function ChatInput({ chatId }: Props) {
+function ChatInput({ id }: Props) {
     const [prompt, setPrompt] = useState('');
     // write a use ref hook to get the input value using useRef
     const inputRef = useRef(null);

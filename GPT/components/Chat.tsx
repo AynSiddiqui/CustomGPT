@@ -1,8 +1,8 @@
 type Props = {
-    chatId: string;
+    id: string;
 }
 
-function Chat({ chatId }: Props) {
+function Chat({ id }: Props) {
     return (
         <div>send face + +shies</div>
     )
