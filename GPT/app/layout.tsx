@@ -6,6 +6,7 @@ import SessionProvider from "@/components/SessionProvider";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getServerSession } from "next-auth/next";
 import Login from "@/components/Login";
+import ClientProvider from "@/components/ClientProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -42,10 +43,11 @@ export default async function RootLayout({
           ) : (
             <div className="flex">
               {/* Sidebar */}
-              <div className="bg-slate-900 max-w-sm h-screen overflow-y-auto
+              <div className="bg-slate-900 max-w-xs h-screen overflow-y-auto
            md:min-w-[20rem]">
                 <SideBar />
               </div>
+              <ClientProvider />
               {/* Centre page */}
               <div className="bg-slate-700 flex-1">{children}</div>
             </div>

@@ -15,36 +15,26 @@ type Props = {
 };
 
 function ChatRow({ id }: Props) {
-    const pathname = usePathname();
+    const pathname = usePathname() as string;
     const router = useRouter();
     const { data: session } = useSession();
     const [active, setActive] = useState(false);
     const [messages] = useCollection(
         collection(db, "users", session?.user?.email!, 'chats', id, 'messages'),
     );
+
+    const removeChat = async () => {
+        await deleteDoc(doc(db, 'users', session?.user?.email!, 'chats', id));
+        router.replace('/');
+    };
     useEffect(() => {
         if (!pathname) return;
         setActive(pathname.includes(id));
-    }, [pathname]);
-    // write function to delete inactive chat, when you click on trash icon
-    // you will still remain on your current chat, but the chat will be deleted
-    // write a conditional statement to check if the chat is active or not
-    // if it is active, then delete the chat and redirect to home page
-    // if it is not active, then delete the chat and remain on the current chat
-    const removeChat = async () => {
-        if (pathname?.includes(id)) {
-            await deleteDoc(doc(db, 'users', session?.user?.email!, 'chats', id));
-            router.replace('/');
-        } else {
-            await deleteDoc(doc(db, 'users', session?.user?.email!, 'chats', id));
-            //keep router link unchanged
-            router.replace(pathname!);
-        }
-    };
+    }, [id, pathname]);
     return (
         <Link
             href={`/chat/${id}`}
-            className={`chatRow justify-center 
+            className={`chatRow justify-center transition duration-200 ease-in-out
             ${active && 'bg-gray-700'}`}
         >
             <ChatBubbleLeftIcon className=" justify-start h-5 w-5" />

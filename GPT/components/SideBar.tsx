@@ -12,7 +12,6 @@ function SideBar() {
             collection(db, "users", session.user?.email!, "chats"),
             orderBy('createdAt', 'asc')
         ));
-    console.log(chats);
 
     return (
         <div className="flex flex-col p-2 h-screen">

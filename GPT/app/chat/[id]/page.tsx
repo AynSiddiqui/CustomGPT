@@ -8,13 +8,16 @@ type Props = {
 }
 
 function ChatPage({ params: { id } }: Props) {
-    console.log(id);
+    // console.log(id);
     return (
         <>
-            {/* chat */}
-            <Chat id={id} />
-            {/* chat input */}
-            <ChatInput id={id} />
+            <div className=" flex flex-col h-screen overflow-hidden">
+                {/* chat */}
+                <Chat id={id} />
+                {/* chat input */}
+                <ChatInput id={id} />
+            </div>
+
         </>
     )
 }

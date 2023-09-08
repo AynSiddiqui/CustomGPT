@@ -1,54 +1,83 @@
 'use client'
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
-import { use, useRef, useState } from "react";
-
+import { FormEvent, use, useEffect, useRef, useState } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/firebase";
+import { toast } from "react-hot-toast";
 type Props = {
     id: string;
 }
 
 function ChatInput({ id }: Props) {
-    const [prompt, setPrompt] = useState('');
-    // write a use ref hook to get the input value using useRef
-    const inputRef = useRef(null);
+    // const [prompt, setPrompt] = useState('');
+    const [val, setVal] = useState('');
     const { data: session } = useSession();
-    const onClick = (e) => {
-        //prevent default
+
+    //TODO: useSWR to get model
+    const model = 'text-davinci-003';
+
+    const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(inputRef.current.value);
-    }
-
-    const handleInputChange = () => {
-        const inputValue = inputRef.current.value;
-        const submitButton = document.getElementById('sendButton');
-
-        if (inputValue === '') {
-            submitButton!.disabled = true;
-        } else {
-            submitButton!.disabled = false;
+        if (!val) return;
+        const input = val.trim();
+        setVal('');
+        const message: Message = {
+            text: input,
+            createdAt: serverTimestamp(),
+            user: {
+                _id: session?.user?.email!,
+                name: session?.user?.name!,
+                avatar: session?.user?.image!,
+            }
         }
-    };
+        await addDoc(
+            collection(db, 'users', session?.user?.email!, 'chats', id, 'messages'),
+            message
+        )
 
+        //toast notif loading
+        // clear all toasts
+        // toast.dismiss();
+        const notif = toast.loading('ChatGPT is thinking...');
+
+        await fetch('/api/askQuestion?', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: input, id, model, session
+            })
+        }).then(() => {
+            //Toast notif sucess
+            toast.success('ChatGPT has responded!', {
+                id: notif,
+            });
+        });
+    };
     return (
         <div className="bg-slate-600 text-gray-300 rounded-lg text-sm 
          ">
-            <form className="p-5 space-x-5 rounded-lg flex">
+            <form className="p-5 space-x-5 rounded-lg flex"
+                onSubmit={sendMessage}
+            >
                 <input type="text"
                     className="bg-transparent flex-1 focus:outline-none disabled:cursor-not-allowed
                     disabled:text-gray-300 font-bold"
                     // value={prompt}
                     disabled={!session}
-                    onChange={handleInputChange}
-                    placeholder="Type a message"
-                    ref={inputRef} />
+                    onChange={(e) => setVal(e.target.value)}
+                    value={val}
+                    placeholder="Type a message" />
                 <button
                     id="sendButton"
-                    disabled
-                    onClick={onClick} type="submit"
-                    className=" hover:opacity-60 bg-[#5bbc7193]
-                    px-4 py-2 text-white font-bold "
+                    disabled={!session || !val}
+                    type="submit"
+                    className="disabled:opacity-40 hover:opacity-80 bg-[#5bbc72c7]
+                    px-4 py-2 text-white font-bold rounded-xl hover:ease-in-out transition-all"
                 >
-                    <PaperAirplaneIcon className="h-4 w-4 -rotate-45" />
+                    <PaperAirplaneIcon className="h-3 w-4 -rotate-45" />
                 </button>
             </form>
             <div>
